@@ -3,14 +3,14 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 COPY . .
 
 # Crear usuario no-root
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S appuser -u 1001 && \
-    chown -R appuser:nodejs /app
+  adduser -S appuser -u 1001 && \
+  chown -R appuser:nodejs /app
 
 USER appuser
 

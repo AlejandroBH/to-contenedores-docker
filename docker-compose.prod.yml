@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "${FRONTEND_PORT:-80}:80"
     depends_on:
       - api
     networks:
@@ -17,11 +17,11 @@ services:
       context: ./api
       dockerfile: Dockerfile
     ports:
-      - "4000:4000"
+      - "${API_PORT:-4000}:4000"
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://user:pass@db:5432/app
-      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=${NODE_ENV:-production}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://user:pass@db:5432/app}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379}
     depends_on:
       - db
       - redis
@@ -31,9 +31,9 @@ services:
   db:
     image: postgres:13-alpine
     environment:
-      - POSTGRES_DB=app
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=secure_password
+      - POSTGRES_DB=${POSTGRES_DB:-app}
+      - POSTGRES_USER=${POSTGRES_USER:-user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change_me_in_production}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -49,10 +49,10 @@ services:
   nginx:
     image: nginx:alpine
     ports:
-      - "443:443"
+      - "${NGINX_HTTPS_PORT:-443}:443"
     volumes:
       - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - frontend
     networks:
